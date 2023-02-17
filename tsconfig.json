@@ -1,0 +1,23 @@
+{
+  "extends": "@tsconfig/node18/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "baseUrl": "src",
+    "paths": {
+      "@utils/*": ["./utils/*"],
+      "@lib/*": ["./lib/*"]
+    },
+    "outDir": "./dist",
+    "plugins": [
+      /* Transform paths in output .js files */
+      {
+        "transform": "typescript-transform-paths"
+      },
+      /* Transform paths in output .d.ts files */
+      {
+        "transform": "typescript-transform-paths",
+        "afterDeclarations": true
+      }
+    ]
+  }
+}

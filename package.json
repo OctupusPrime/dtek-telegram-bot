@@ -1,0 +1,35 @@
+{
+  "name": "dtek-telegram-bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "nodemon",
+    "build": "tsc -p .",
+    "prepare": "npx ts-patch install -s",
+    "test": "ts-node --transpile-only ./src/test.ts"
+  },
+  "dependencies": {
+    "axios": "^1.3.3",
+    "dotenv": "^16.0.3",
+    "kysely": "^0.23.4",
+    "pg": "^8.9.0",
+    "qs": "^6.11.0",
+    "telegraf": "^4.11.2",
+    "zod": "^3.20.6"
+  },
+  "devDependencies": {
+    "@tsconfig/node18": "^1.0.1",
+    "@types/node": "^18.13.0",
+    "@types/pg": "^8.6.6",
+    "@types/qs": "^6.9.7",
+    "nodemon": "^2.0.20",
+    "ts-node": "^10.9.1",
+    "ts-patch": "^2.1.0",
+    "tsconfig-paths": "^4.1.2",
+    "tslib": "^2.5.0",
+    "typescript": "^4.9.5",
+    "typescript-transform-paths": "^3.4.6"
+  }
+}
