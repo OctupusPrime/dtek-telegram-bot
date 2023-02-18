@@ -5,7 +5,8 @@
     "baseUrl": "src",
     "paths": {
       "@utils/*": ["./utils/*"],
-      "@lib/*": ["./lib/*"]
+      "@lib/*": ["./lib/*"],
+      "@data/*": ["./data/*"]
     },
     "outDir": "./dist",
     "plugins": [
