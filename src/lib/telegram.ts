@@ -1,5 +1,5 @@
-import { Telegraf } from "telegraf";
+import { Scenes, Telegraf } from "telegraf";
 
-const bot = new Telegraf(process.env.BOT_TOKEN as string);
+const bot = new Telegraf<Scenes.WizardContext>(process.env.BOT_TOKEN as string);
 
 export { bot };

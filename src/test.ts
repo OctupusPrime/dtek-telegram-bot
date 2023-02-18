@@ -1,21 +1,24 @@
 import { getData } from "@lib/api";
+import { getStreetsStartWithNum, getStreetsStartWithStr } from "@utils/data";
 
-(async () => {
-  const [data, err] = await getData({
-    city: "Одеса",
-    street: "Ільфа і Петрова вул.",
-    house: "55/2",
-  });
+console.log(JSON.stringify(getStreetsStartWithStr()));
 
-  if (err) {
-    console.log("err");
+// (async () => {
+//   const [data, err] = await getData({
+//     city: "Одеса",
+//     street: "Ільфа і Петрова вул.",
+//     house: "55/2",
+//   });
 
-    console.error(err);
+//   if (err) {
+//     console.log("err");
 
-    return;
-  }
+//     console.error(err);
 
-  console.log("data");
+//     return;
+//   }
 
-  console.log(data);
-})();
+//   console.log("data");
+
+//   console.log(data);
+// })();

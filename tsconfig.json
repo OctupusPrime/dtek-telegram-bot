@@ -6,7 +6,8 @@
     "paths": {
       "@utils/*": ["./utils/*"],
       "@lib/*": ["./lib/*"],
-      "@data/*": ["./data/*"]
+      "@data/*": ["./data/*"],
+      "@services/*": ["./services/*"]
     },
     "outDir": "./dist",
     "plugins": [
