@@ -3,8 +3,8 @@ dotenv.config();
 import { env } from "@utils/config";
 
 import { db } from "@lib/db";
-import { bot } from "@lib/telegram";
-import { getData } from "@lib/api";
+import { bot } from "@lib/telegraf";
+import { getData } from "@services/api";
 import { generateButtonsRow, getActionVariables } from "@utils/telegram";
 import { getStreetsStartWithNum, getStreetsStartWithStr } from "@utils/data";
 

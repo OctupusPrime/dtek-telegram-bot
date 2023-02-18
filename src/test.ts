@@ -1,4 +1,4 @@
-import { getData } from "@lib/api";
+import { getData } from "@services/api";
 import { getStreetsStartWithNum, getStreetsStartWithStr } from "@utils/data";
 
 console.log(JSON.stringify(getStreetsStartWithStr()));
