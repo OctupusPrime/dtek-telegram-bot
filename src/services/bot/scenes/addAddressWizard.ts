@@ -10,7 +10,7 @@ const addAddressWizard: Scenes.WizardScene<
     return ctx.wizard.next();
   },
   async (ctx) => {
-    ctx.reply(messages["add-new-address"]["street-type"], {
+    await ctx.reply(messages["add-new-address"]["street-type"], {
       reply_markup: {
         inline_keyboard: [
           [
