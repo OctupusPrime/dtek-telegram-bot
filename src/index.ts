@@ -1,6 +1,7 @@
 import * as dotenv from "dotenv";
+import { checkConfig } from "./config";
 dotenv.config();
-import { env } from "@utils/config";
+checkConfig();
 
 import { bot } from "@lib/telegraf";
 
