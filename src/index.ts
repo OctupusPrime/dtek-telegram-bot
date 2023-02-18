@@ -10,6 +10,15 @@ import addAddressWizard from "@services/bot/scenes/addAddressWizard";
 
 import actionHandler from "@services/bot/actions";
 import commandsHandler from "@services/bot/commands";
+import telegrafThrottler from "telegraf-throttler";
+
+const throttler = telegrafThrottler({
+  inThrottlerError: async (ctx) => {
+    ctx.reply("I am throttled");
+  },
+});
+
+bot.use(throttler);
 
 const stage = new Scenes.Stage<Scenes.WizardContext>([addAddressWizard]);
 
