@@ -1,12 +1,13 @@
-import { Kysely, PostgresDialect } from "kysely";
+import { Generated, Kysely, PostgresDialect } from "kysely";
 import { Pool } from "pg";
 
 interface UsersTable {
-  id: number;
-  city: string;
-  street?: string;
-  house?: string;
-  updatestate?: string;
+  id: Generated<number>;
+  user_id: number;
+  name: string;
+  city?: string;
+  street: string;
+  house: string;
 }
 
 interface Database {

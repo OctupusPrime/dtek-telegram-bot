@@ -1,4 +1,4 @@
-import messages from "@data/messages";
+import messages from "@data/messages.json";
 import { Scenes } from "telegraf";
 
 const addAddressWizard: Scenes.WizardScene<

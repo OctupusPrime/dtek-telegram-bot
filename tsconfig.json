@@ -1,6 +1,7 @@
 {
   "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
+    "resolveJsonModule": true,
     "rootDir": ".",
     "baseUrl": "src",
     "paths": {
