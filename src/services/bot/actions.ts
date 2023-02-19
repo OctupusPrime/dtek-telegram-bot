@@ -32,7 +32,7 @@ actionHandler.action(/^.*\add\b.*/, async (ctx) => {
     });
 
     if (addErr || !addData) {
-      await ctx.editMessageText(messages["db"]["add"]);
+      await ctx.editMessageText(messages["errors"]["db"]["add"]);
 
       return;
     }
@@ -46,7 +46,7 @@ actionHandler.action(/^.*\add\b.*/, async (ctx) => {
     const [data, err] = await getShutdownsListInfo({ street });
 
     if (err || !data) {
-      await ctx.editMessageText(messages["api"]["error"], {
+      await ctx.editMessageText(messages["errors"]["api"], {
         reply_markup: {
           inline_keyboard: [generateRepeatButton(actionState)],
         },
@@ -124,7 +124,7 @@ actionHandler.action(/^.*delete.*$/, async (ctx) => {
   const [deleteData, deleteErr] = await deleteAddress(+id);
 
   if (deleteErr || !deleteData) {
-    await ctx.editMessageText(messages["db"]["delete"]);
+    await ctx.editMessageText(messages["errors"]["db"]["delete"]);
 
     return;
   }

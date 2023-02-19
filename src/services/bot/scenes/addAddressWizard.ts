@@ -18,7 +18,7 @@ const addAddressWizard: Scenes.WizardScene<
     const [data, err] = await getAllAddresses(message.from.id);
 
     if (err || !data) {
-      await ctx.reply(messages["db"]["get"]);
+      await ctx.reply(messages["errors"]["db"]["get"]);
 
       return ctx.scene.leave();
     }

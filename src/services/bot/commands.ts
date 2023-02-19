@@ -8,17 +8,13 @@ const commandsHandler = new Composer<Scenes.WizardContext>();
 
 commandsHandler.command("add", (ctx) => ctx.scene.enter("ADD_ADDRESS_WIZARD"));
 
-commandsHandler.command("test", (ctx) => {
-  const { from } = ctx.update.message;
-});
-
 commandsHandler.command("delete", async (ctx) => {
   const { from } = ctx.update.message;
 
   const [data, err] = await getAllAddresses(from.id);
 
   if (err || !data) {
-    await ctx.reply(messages["db"]["get"]);
+    await ctx.reply(messages["errors"]["db"]["get"]);
 
     return;
   }
@@ -33,7 +29,7 @@ commandsHandler.command("delete", async (ctx) => {
     const [deleteData, deleteErr] = await deleteAddress(data[0].id);
 
     if (deleteErr || !deleteData) {
-      await ctx.reply(messages["db"]["delete"]);
+      await ctx.reply(messages["errors"]["db"]["delete"]);
 
       return;
     }
@@ -53,6 +49,38 @@ commandsHandler.command("delete", async (ctx) => {
     },
   });
 
+  return;
+});
+
+commandsHandler.command("list", async (ctx) => {
+  const { from } = ctx.update.message;
+
+  const [data, err] = await getAllAddresses(from.id);
+
+  if (err || !data) {
+    await ctx.reply(messages["errors"]["db"]["get"]);
+
+    return;
+  }
+
+  if (!data.length) {
+    await ctx.reply(messages["list"]["empty"]);
+
+    return;
+  }
+
+  await ctx.reply(messages["list"]["success"]);
+
+  for (const address of data) {
+    await ctx.reply(
+      "Назва: " +
+        address.name +
+        "\nВулиця: " +
+        address.street +
+        "\nДiм: " +
+        address.house
+    );
+  }
   return;
 });
 
