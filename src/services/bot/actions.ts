@@ -1,4 +1,4 @@
-import { addAddress } from "@services/db";
+import { addAddress, deleteAddress } from "@services/db";
 import { getStreetsStartWithNum, getStreetsStartWithStr } from "@utils/data";
 import {
   generateButtonsRow,
@@ -24,19 +24,15 @@ actionHandler.action(/^.*\add\b.*/, async (ctx) => {
     getActionVariables(actionState);
 
   if (house) {
-    const [data, err] = await addAddress({
+    const [addData, addErr] = await addAddress({
       user_id: from.id,
       house,
       street,
       name,
     });
 
-    if (err || !data) {
-      await ctx.editMessageText(messages["db"]["add"], {
-        reply_markup: {
-          inline_keyboard: [generateRepeatButton(actionState)],
-        },
-      });
+    if (addErr || !addData) {
+      await ctx.editMessageText(messages["db"]["add"]);
 
       return;
     }
@@ -59,7 +55,7 @@ actionHandler.action(/^.*\add\b.*/, async (ctx) => {
       return;
     }
 
-    const dataArr = Object.keys(data);
+    const dataArr = Object.keys(data).sort();
 
     await ctx.editMessageText(messages["add-new-address"]["house"], {
       reply_markup: {
@@ -117,6 +113,24 @@ actionHandler.action(/^.*\add\b.*/, async (ctx) => {
     });
     return;
   }
+});
+
+actionHandler.action(/^.*delete.*$/, async (ctx) => {
+  const { match } = ctx;
+
+  const actionState = match[0];
+  const [, id] = getActionVariables(actionState);
+
+  const [deleteData, deleteErr] = await deleteAddress(+id);
+
+  if (deleteErr || !deleteData) {
+    await ctx.editMessageText(messages["db"]["delete"]);
+
+    return;
+  }
+
+  await ctx.editMessageText(messages["delete"]["success"]);
+  return;
 });
 
 export default actionHandler;

@@ -6,7 +6,7 @@ async function handler<T>(
 
     return [data, null];
   } catch (error) {
-    console.log(JSON.stringify(error, null, 2));
+    console.error(JSON.stringify(error, null, 2));
 
     return [null, error];
   }

@@ -3,7 +3,12 @@ const getActionVariables = (str: string): string[] => {
 };
 
 const generateButtonsRow = (
-  list: string[],
+  list:
+    | {
+        label: string;
+        value: string;
+      }[]
+    | string[],
   callbackState: string,
   row: number = 2
 ): { text: string; callback_data: string }[][] => {
@@ -16,10 +21,19 @@ const generateButtonsRow = (
       buttonsArr[k] = [];
     }
 
-    buttonsArr[k].push({
-      text: list[i],
-      callback_data: callbackState + "," + list[i],
-    });
+    const item = list[i];
+
+    if (typeof item === "string") {
+      buttonsArr[k].push({
+        text: item,
+        callback_data: callbackState + "," + item,
+      });
+    } else {
+      buttonsArr[k].push({
+        text: item.label,
+        callback_data: callbackState + "," + item.value,
+      });
+    }
   }
 
   return buttonsArr;

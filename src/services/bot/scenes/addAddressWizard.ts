@@ -42,9 +42,6 @@ const addAddressWizard: Scenes.WizardScene<
 
     //@ts-ignore state is object type
     const { data } = ctx.wizard.state;
-    console.log("state");
-    console.log(data);
-
     //@ts-ignore bcs text is not in types
     const name = message.text?.trim();
 
