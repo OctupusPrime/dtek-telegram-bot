@@ -1,43 +1,120 @@
+import { addAddress } from "@services/db";
 import { getStreetsStartWithNum, getStreetsStartWithStr } from "@utils/data";
-import { generateButtonsRow, getActionVariables } from "@utils/telegraf";
+import {
+  generateButtonsRow,
+  generateRepeatButton,
+  getActionVariables,
+} from "@utils/telegraf";
 import { Composer } from "telegraf";
+
+import messages from "@data/messages.json";
+import { getShutdownsListInfo } from "@services/api";
 
 const actionHandler = new Composer();
 
-actionHandler.action(/^.*\bcreate\b.*/, (ctx) => {
+actionHandler.action(/^.*\add\b.*/, async (ctx) => {
   const {
     update: { callback_query },
     match,
   } = ctx;
   const { from } = callback_query;
-  console.log("action");
-  console.log(ctx);
 
-  const [type] = getActionVariables(match[0]);
-  console.log(match);
+  const actionState = match[0];
+  const [name, type, startWith, street, house] =
+    getActionVariables(actionState);
+
+  if (house) {
+    const [data, err] = await addAddress({
+      user_id: from.id,
+      house,
+      street,
+      name,
+    });
+
+    if (err || !data) {
+      await ctx.editMessageText(messages["db"]["add"], {
+        reply_markup: {
+          inline_keyboard: [generateRepeatButton(actionState)],
+        },
+      });
+
+      return;
+    }
+
+    await ctx.editMessageText(messages["add-new-address"]["success"]);
+
+    return;
+  }
+
+  if (street) {
+    const [data, err] = await getShutdownsListInfo({ street });
+
+    if (err || !data) {
+      await ctx.editMessageText(messages["api"]["error"], {
+        reply_markup: {
+          inline_keyboard: [generateRepeatButton(actionState)],
+        },
+      });
+
+      return;
+    }
+
+    const dataArr = Object.keys(data);
+
+    await ctx.editMessageText(messages["add-new-address"]["house"], {
+      reply_markup: {
+        inline_keyboard: generateButtonsRow(dataArr, actionState, 4),
+      },
+    });
+
+    return;
+  }
 
   if (type === "num") {
-    const numSteetsArr = Object.keys(getStreetsStartWithNum());
+    const addressesStartNum = getStreetsStartWithNum();
 
-    ctx.editMessageText("Оберіть номер вулиці.\n\nПриклад:\n5-а Лінія - 5-a", {
+    if (startWith) {
+      const dataArr = addressesStartNum[startWith];
+
+      ctx.editMessageText(messages["add-new-address"]["street-name"], {
+        reply_markup: {
+          inline_keyboard: generateButtonsRow(dataArr, actionState, 1),
+        },
+      });
+      return;
+    }
+
+    const numSteetsArr = Object.keys(addressesStartNum);
+
+    ctx.editMessageText(messages["add-new-address"]["street-type-num"], {
       reply_markup: {
-        inline_keyboard: generateButtonsRow(numSteetsArr, match[0], 5),
+        inline_keyboard: generateButtonsRow(numSteetsArr, actionState, 5),
       },
     });
     return;
   }
 
   if (type === "char") {
-    const charStreetsArr = Object.keys(getStreetsStartWithStr());
+    const addressesStartStr = getStreetsStartWithStr();
 
-    ctx.editMessageText(
-      "Оберіть першу літеру вулиці.\n\nПриклад:\nДальня вул. - Д",
-      {
+    if (startWith) {
+      const dataArr = addressesStartStr[startWith];
+
+      ctx.editMessageText(messages["add-new-address"]["street-name"], {
         reply_markup: {
-          inline_keyboard: generateButtonsRow(charStreetsArr, match[0], 5),
+          inline_keyboard: generateButtonsRow(dataArr, actionState, 1),
         },
-      }
-    );
+      });
+      return;
+    }
+
+    const charStreetsArr = Object.keys(addressesStartStr);
+
+    ctx.editMessageText(messages["add-new-address"]["street-type-char"], {
+      reply_markup: {
+        inline_keyboard: generateButtonsRow(charStreetsArr, actionState, 5),
+      },
+    });
     return;
   }
 });

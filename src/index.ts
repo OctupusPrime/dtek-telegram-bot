@@ -4,13 +4,13 @@ dotenv.config();
 checkConfig();
 
 import { bot } from "@lib/telegraf";
+import telegrafThrottler from "telegraf-throttler";
 
 import { Scenes, session } from "telegraf";
-import addAddressWizard from "@services/bot/scenes/addAddressWizard";
+import { addAddressWizard } from "@services/bot/scenes";
 
 import actionHandler from "@services/bot/actions";
 import commandsHandler from "@services/bot/commands";
-import telegrafThrottler from "telegraf-throttler";
 
 const throttler = telegrafThrottler({
   inThrottlerError: async (ctx) => {

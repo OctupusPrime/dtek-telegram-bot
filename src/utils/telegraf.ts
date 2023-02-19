@@ -25,4 +25,13 @@ const generateButtonsRow = (
   return buttonsArr;
 };
 
-export { getActionVariables, generateButtonsRow };
+const generateRepeatButton = (callbackState: string) => {
+  return [
+    {
+      text: "Повторити",
+      callback_data: callbackState,
+    },
+  ];
+};
+
+export { getActionVariables, generateButtonsRow, generateRepeatButton };

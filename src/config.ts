@@ -4,6 +4,7 @@ const schema = z.object({
   BOT_TOKEN: z.string(),
   DATABASE_URL: z.string(),
   API_URL: z.string(),
+  ADDRESSES_LIMIT: z.string().optional(),
 });
 
 const checkConfig = () => {

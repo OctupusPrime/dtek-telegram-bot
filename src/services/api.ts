@@ -26,11 +26,11 @@ const reqApiData = (formData: string) => {
 };
 
 const getShutdownsListInfo = ({
-  city,
   street,
+  city = "Одеса",
 }: {
-  city: string;
   street: string;
+  city?: string;
 }) => {
   const formData = qs.stringify({
     method: "getHomeNum",
@@ -51,13 +51,13 @@ const getShutdownsListInfo = ({
 };
 
 const getShutdownsHouseInfo = ({
-  city,
   street,
   house,
+  city = "Одеса",
 }: {
-  city: string;
   street: string;
   house: string;
+  city?: string;
 }) => {
   const formData = qs.stringify({
     method: "getHomeNum",

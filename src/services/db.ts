@@ -18,10 +18,7 @@ const addAddress = (data: AddAddressForm) => {
   return handler(db.insertInto("users").values(data).executeTakeFirst());
 };
 
-const updateAddress = async (
-  table_id: number,
-  data: Partial<AddAddressForm>
-) => {
+const updateAddress = (table_id: number, data: Partial<AddAddressForm>) => {
   return handler(
     db
       .updateTable("users")
