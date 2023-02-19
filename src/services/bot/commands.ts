@@ -3,6 +3,7 @@ import { Composer, Scenes } from "telegraf";
 
 import messages from "@data/messages.json";
 import { generateButtonsRow } from "@utils/telegraf";
+import { getShutdownsHouseInfo } from "@services/api";
 
 const commandsHandler = new Composer<Scenes.WizardContext>();
 
@@ -20,7 +21,7 @@ commandsHandler.command("delete", async (ctx) => {
   }
 
   if (!data.length) {
-    await ctx.reply(messages["delete"]["empty"]);
+    await ctx.reply(messages["list"]["empty"]);
 
     return;
   }
@@ -43,7 +44,7 @@ commandsHandler.command("delete", async (ctx) => {
     value: el.id + "",
   }));
 
-  await ctx.reply(messages["delete"]["name"], {
+  await ctx.reply(messages["delete"]["list"], {
     reply_markup: {
       inline_keyboard: generateButtonsRow(addressList, "delete&", 2),
     },
@@ -81,6 +82,51 @@ commandsHandler.command("list", async (ctx) => {
         address.house
     );
   }
+  return;
+});
+
+commandsHandler.command("check", async (ctx) => {
+  const { from } = ctx.update.message;
+
+  const [userData, userErr] = await getAllAddresses(from.id);
+
+  if (userErr || !userData) {
+    await ctx.reply(messages["errors"]["db"]["get"]);
+
+    return;
+  }
+
+  if (!userData.length) {
+    await ctx.reply(messages["list"]["empty"]);
+
+    return;
+  }
+
+  if (userData.length === 1) {
+    const [data, err] = await getShutdownsHouseInfo({ ...userData[0] });
+
+    if (err || !data) {
+      await ctx.editMessageText(messages["errors"]["api"]);
+
+      return;
+    }
+
+    await ctx.reply(JSON.stringify(data, null, 2));
+
+    return;
+  }
+
+  const addressList = userData.map((el) => ({
+    label: el.name,
+    value: el.street + "," + el.house,
+  }));
+
+  await ctx.reply(messages["check"]["list"], {
+    reply_markup: {
+      inline_keyboard: generateButtonsRow(addressList, "check&", 2),
+    },
+  });
+
   return;
 });
 

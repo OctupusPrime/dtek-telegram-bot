@@ -8,7 +8,7 @@ import {
 import { Composer } from "telegraf";
 
 import messages from "@data/messages.json";
-import { getShutdownsListInfo } from "@services/api";
+import { getShutdownsHouseInfo, getShutdownsListInfo } from "@services/api";
 
 const actionHandler = new Composer();
 
@@ -130,6 +130,25 @@ actionHandler.action(/^.*delete.*$/, async (ctx) => {
   }
 
   await ctx.editMessageText(messages["delete"]["success"]);
+  return;
+});
+
+actionHandler.action(/^.*check.*$/, async (ctx) => {
+  const { match } = ctx;
+
+  const actionState = match[0];
+  const [, street, house] = getActionVariables(actionState);
+
+  const [data, err] = await getShutdownsHouseInfo({ street, house });
+
+  if (err || !data) {
+    await ctx.editMessageText(messages["errors"]["api"]);
+
+    return;
+  }
+
+  await ctx.editMessageText(JSON.stringify(data, null, 2));
+
   return;
 });
 
