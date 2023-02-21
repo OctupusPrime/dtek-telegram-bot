@@ -5,7 +5,32 @@ import messages from "@data/messages.json";
 import { generateButtonsRow } from "@utils/telegraf";
 import { getShutdownsHouseInfo } from "@services/api";
 
+const addressesLimit = process.env.ADDRESSES_LIMIT
+  ? +process.env.ADDRESSES_LIMIT
+  : 4;
+
 const commandsHandler = new Composer<Scenes.WizardContext>();
+
+commandsHandler.command("start", (ctx) =>
+  ctx.reply(messages["about"], {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: "Офіційний сайт",
+            url: "https://www.dtek-oem.com.ua/ua",
+          },
+        ],
+        [
+          {
+            text: "Sourse code",
+            url: "https://github.com/OctupusPrime/dtek-telegram-bot",
+          },
+        ],
+      ],
+    },
+  })
+);
 
 commandsHandler.command("add", (ctx) => ctx.scene.enter("ADD_ADDRESS_WIZARD"));
 
@@ -46,7 +71,7 @@ commandsHandler.command("delete", async (ctx) => {
 
   await ctx.reply(messages["delete"]["list"], {
     reply_markup: {
-      inline_keyboard: generateButtonsRow(addressList, "delete&", 2),
+      inline_keyboard: generateButtonsRow(addressList, "d&", 2),
     },
   });
 
@@ -70,16 +95,13 @@ commandsHandler.command("list", async (ctx) => {
     return;
   }
 
-  await ctx.reply(messages["list"]["success"]);
+  await ctx.reply(
+    `Список адреc (${data.length}/${addressesLimit}):\nУ форматі (назва · вулиця · дiм)`
+  );
 
   for (const address of data) {
     await ctx.reply(
-      "Назва: " +
-        address.name +
-        "\nВулиця: " +
-        address.street +
-        "\nДiм: " +
-        address.house
+      address.name + "\n" + address.street + "\n" + address.house
     );
   }
   return;
@@ -111,7 +133,29 @@ commandsHandler.command("check", async (ctx) => {
       return;
     }
 
-    await ctx.reply(JSON.stringify(data, null, 2));
+    if (data.sub_type) {
+      await ctx.reply(
+        `За вашою адрессою в даний момент вiдсутня електроенергiя\nПричина: *${data.start_date}*\nЧас початку - *${data.start_date}*\nОрієнтовний час вiдновлення - *до ${data.end_date}*`,
+        {
+          parse_mode: "Markdown",
+        }
+      );
+
+      return;
+    }
+
+    await ctx.reply(messages["check"]["generic"], {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: "Форма",
+              url: "https://www.dtek-oem.com.ua/ua/shutdowns",
+            },
+          ],
+        ],
+      },
+    });
 
     return;
   }
@@ -123,11 +167,15 @@ commandsHandler.command("check", async (ctx) => {
 
   await ctx.reply(messages["check"]["list"], {
     reply_markup: {
-      inline_keyboard: generateButtonsRow(addressList, "check&", 2),
+      inline_keyboard: generateButtonsRow(addressList, "c&", 2),
     },
   });
 
   return;
 });
+
+commandsHandler.command("help", (ctx) =>
+  ctx.reply(messages["help"]["message"])
+);
 
 export default commandsHandler;

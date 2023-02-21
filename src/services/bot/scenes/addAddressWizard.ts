@@ -6,6 +6,8 @@ const addressesLimit = process.env.ADDRESSES_LIMIT
   ? +process.env.ADDRESSES_LIMIT
   : 4;
 
+const nameRegex = /^[^\/]{1,10}$/;
+
 const addAddressWizard: Scenes.WizardScene<
   Scenes.WizardContext<Scenes.WizardSessionData>
 > = new Scenes.WizardScene(
@@ -45,8 +47,8 @@ const addAddressWizard: Scenes.WizardScene<
     //@ts-ignore bcs text is not in types
     const name = message.text?.trim();
 
-    if (!name || !name?.length) {
-      await ctx.reply(messages["add-new-address"]["name-error-length"]);
+    if (!name || !nameRegex.test(name)) {
+      await ctx.reply(messages["add-new-address"]["name-error-regex"]);
       return;
     }
 
@@ -59,8 +61,8 @@ const addAddressWizard: Scenes.WizardScene<
       reply_markup: {
         inline_keyboard: [
           [
-            { text: "Цифра", callback_data: `add&${name},num` },
-            { text: "Літера", callback_data: `add&${name},char` },
+            { text: "Цифра", callback_data: `a&${name},n` },
+            { text: "Літера", callback_data: `a&${name},c` },
           ],
         ],
       },

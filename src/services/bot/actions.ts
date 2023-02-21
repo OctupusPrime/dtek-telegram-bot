@@ -1,10 +1,6 @@
 import { addAddress, deleteAddress } from "@services/db";
 import { getStreetsStartWithNum, getStreetsStartWithStr } from "@utils/data";
-import {
-  generateButtonsRow,
-  generateRepeatButton,
-  getActionVariables,
-} from "@utils/telegraf";
+import { generateButtonsRow, getActionVariables } from "@utils/telegraf";
 import { Composer } from "telegraf";
 
 import messages from "@data/messages.json";
@@ -12,7 +8,7 @@ import { getShutdownsHouseInfo, getShutdownsListInfo } from "@services/api";
 
 const actionHandler = new Composer();
 
-actionHandler.action(/^.*\add\b.*/, async (ctx) => {
+actionHandler.action(/^.*\a\b.*/, async (ctx) => {
   const {
     update: { callback_query },
     match,
@@ -23,11 +19,17 @@ actionHandler.action(/^.*\add\b.*/, async (ctx) => {
   const [name, type, startWith, street, house] =
     getActionVariables(actionState);
 
+  const parsedStreet = street
+    ? type === "n"
+      ? getStreetsStartWithNum()[startWith][+street]
+      : getStreetsStartWithStr()[startWith][+street]
+    : undefined;
+
   if (house) {
     const [addData, addErr] = await addAddress({
       user_id: from.id,
       house,
-      street,
+      street: parsedStreet as string,
       name,
     });
 
@@ -42,20 +44,29 @@ actionHandler.action(/^.*\add\b.*/, async (ctx) => {
     return;
   }
 
-  if (street) {
-    const [data, err] = await getShutdownsListInfo({ street });
+  if (parsedStreet) {
+    const [apiData, apiErr] = await getShutdownsListInfo({
+      street: parsedStreet,
+    });
 
-    if (err || !data) {
+    if (apiErr || !apiData) {
       await ctx.editMessageText(messages["errors"]["api"], {
         reply_markup: {
-          inline_keyboard: [generateRepeatButton(actionState)],
+          inline_keyboard: [
+            [
+              {
+                text: "Повторити",
+                callback_data: actionState,
+              },
+            ],
+          ],
         },
       });
 
       return;
     }
 
-    const dataArr = Object.keys(data).sort();
+    const dataArr = Object.keys(apiData).sort();
 
     await ctx.editMessageText(messages["add-new-address"]["house"], {
       reply_markup: {
@@ -66,15 +77,18 @@ actionHandler.action(/^.*\add\b.*/, async (ctx) => {
     return;
   }
 
-  if (type === "num") {
+  if (type === "n") {
     const addressesStartNum = getStreetsStartWithNum();
 
     if (startWith) {
-      const dataArr = addressesStartNum[startWith];
+      const parsedStreetArr = addressesStartNum[startWith].map((el, index) => ({
+        label: el,
+        value: index + "",
+      }));
 
       ctx.editMessageText(messages["add-new-address"]["street-name"], {
         reply_markup: {
-          inline_keyboard: generateButtonsRow(dataArr, actionState, 1),
+          inline_keyboard: generateButtonsRow(parsedStreetArr, actionState, 1),
         },
       });
       return;
@@ -90,32 +104,33 @@ actionHandler.action(/^.*\add\b.*/, async (ctx) => {
     return;
   }
 
-  if (type === "char") {
-    const addressesStartStr = getStreetsStartWithStr();
+  const addressesStartStr = getStreetsStartWithStr();
 
-    if (startWith) {
-      const dataArr = addressesStartStr[startWith];
+  if (startWith) {
+    const parsedStreetArr = addressesStartStr[startWith].map((el, index) => ({
+      label: el,
+      value: index + "",
+    }));
 
-      ctx.editMessageText(messages["add-new-address"]["street-name"], {
-        reply_markup: {
-          inline_keyboard: generateButtonsRow(dataArr, actionState, 1),
-        },
-      });
-      return;
-    }
-
-    const charStreetsArr = Object.keys(addressesStartStr);
-
-    ctx.editMessageText(messages["add-new-address"]["street-type-char"], {
+    ctx.editMessageText(messages["add-new-address"]["street-name"], {
       reply_markup: {
-        inline_keyboard: generateButtonsRow(charStreetsArr, actionState, 5),
+        inline_keyboard: generateButtonsRow(parsedStreetArr, actionState, 1),
       },
     });
     return;
   }
+
+  const charStreetsArr = Object.keys(addressesStartStr);
+
+  ctx.editMessageText(messages["add-new-address"]["street-type-char"], {
+    reply_markup: {
+      inline_keyboard: generateButtonsRow(charStreetsArr, actionState, 5),
+    },
+  });
+  return;
 });
 
-actionHandler.action(/^.*delete.*$/, async (ctx) => {
+actionHandler.action(/^.*d.*$/, async (ctx) => {
   const { match } = ctx;
 
   const actionState = match[0];
@@ -133,7 +148,7 @@ actionHandler.action(/^.*delete.*$/, async (ctx) => {
   return;
 });
 
-actionHandler.action(/^.*check.*$/, async (ctx) => {
+actionHandler.action(/^.*c.*$/, async (ctx) => {
   const { match } = ctx;
 
   const actionState = match[0];
@@ -147,7 +162,29 @@ actionHandler.action(/^.*check.*$/, async (ctx) => {
     return;
   }
 
-  await ctx.editMessageText(JSON.stringify(data, null, 2));
+  if (data.sub_type) {
+    await ctx.editMessageText(
+      `За вашою адрессою в даний момент вiдсутня електроенергiя\nПричина: *${data.start_date}*\nЧас початку - *${data.start_date}*\nОрієнтовний час вiдновлення - *до ${data.end_date}*`,
+      {
+        parse_mode: "Markdown",
+      }
+    );
+
+    return;
+  }
+
+  await ctx.editMessageText(messages["check"]["generic"], {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: "Форма",
+            url: "https://www.dtek-oem.com.ua/ua/shutdowns",
+          },
+        ],
+      ],
+    },
+  });
 
   return;
 });
