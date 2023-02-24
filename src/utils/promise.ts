@@ -6,10 +6,27 @@ async function handler<T>(
 
     return [data, null];
   } catch (error) {
-    console.error(JSON.stringify(error, null, 2));
+    console.error(error);
 
     return [null, error];
   }
 }
 
-export { handler };
+async function hadleRetry<T>(
+  promise: Promise<T>,
+  retry: number = 5
+): Promise<[Awaited<T> | null, any]> {
+  if (retry <= 0) return [null, true];
+
+  const [data, err] = await handler<T>(promise);
+
+  if (err) {
+    if (retry === 1) return [data, err];
+
+    return await hadleRetry(promise, retry - 1);
+  }
+
+  return [data, err];
+}
+
+export { handler, hadleRetry };

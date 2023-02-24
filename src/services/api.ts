@@ -1,4 +1,4 @@
-import { handler } from "@utils/promise";
+import { hadleRetry } from "@utils/promise";
 import axios from "axios";
 import qs from "qs";
 
@@ -42,7 +42,7 @@ const getShutdownsListInfo = ({
     "data[1][value]": street,
   });
 
-  return handler<ResData["data"]>(
+  return hadleRetry<ResData["data"]>(
     reqApiData(formData).then((response) => {
       const { data } = response;
       if (!data || !data.result || !data.data)
@@ -69,7 +69,7 @@ const getShutdownsHouseInfo = ({
     "data[1][value]": street,
   });
 
-  return handler<ResDataItem>(
+  return hadleRetry<ResDataItem>(
     reqApiData(formData).then((response) => {
       const { data } = response;
       if (!data || !data.result || !data.data)

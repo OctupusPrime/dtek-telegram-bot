@@ -1,5 +1,5 @@
 import { db } from "@lib/db";
-import { handler } from "@utils/promise";
+import { hadleRetry, handler } from "@utils/promise";
 
 interface AddAddressForm {
   user_id: number;
@@ -9,7 +9,7 @@ interface AddAddressForm {
 }
 
 const getAllAddresses = (user_id: number) => {
-  return handler(
+  return hadleRetry(
     db.selectFrom("users").selectAll().where("user_id", "=", user_id).execute()
   );
 };
