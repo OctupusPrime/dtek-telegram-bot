@@ -75,7 +75,9 @@ const getShutdownsHouseInfo = ({
     reqApiData(formData).then((response) => {
       const { data } = response;
       if (!data || !data.result || !data.data)
-        throw new Error("Could not get response");
+        throw new Error(
+          "Could not get response, data: " + JSON.stringify(data)
+        );
 
       const resDataHouse: ResDataItem | null = data.data[house];
 
