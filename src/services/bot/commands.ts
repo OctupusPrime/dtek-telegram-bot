@@ -128,7 +128,7 @@ commandsHandler.command("check", async (ctx) => {
     const [data, err] = await getShutdownsHouseInfo({ ...userData[0] });
 
     if (err || !data) {
-      await ctx.editMessageText(messages["errors"]["api"]);
+      await ctx.reply(messages["errors"]["api"]);
 
       return;
     }
